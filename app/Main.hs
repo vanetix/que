@@ -22,13 +22,13 @@ main =
   execParser
     (info (helper <*> parseOptions) $
      fullDesc <>
-     progDesc "A small utility for managing todos" <> header "todo - a thing")
+     progDesc "A small utility for managing todos" <> header "que - a local task manager")
 
 parseOptions :: Parser Options
 parseOptions = Options <$> parseCommand
 
 parseNew :: Parser Command
-parseNew = New <$> strArgument (metavar "CONTENT")
+parseNew = New <$> strArgument (metavar "\"CONTENT\"")
 
 parseList :: Parser Command
 parseList = pure List
@@ -45,7 +45,7 @@ parseCommand =
   command "new"  (info parseNew $ progDesc "create a new item") <>
   command "list" (info parseList $ progDesc "list all items") <>
   command "done" (info parseDone $ progDesc "complete an item") <>
-  command "drop" (info parseDrop $ progDesc "drop and item")
+  command "drop" (info parseDrop $ progDesc "drop an item by id")
 
 run :: Options -> IO ()
 run (Options cmd) = do
