@@ -4,6 +4,23 @@
 
 A Todo tracking CLI tool written in Haskell for learning purposes.
 
+## Building
+
+Project uses [stack](https://docs.haskellstack.org/en/stable/README/) as it's build tool.
+
+- Ensure you have the [Glasgow Haskell Compiler](https://www.haskell.org/ghc/) installed.
+  - For OSX `brew install ghc haskell-stack`
+- `git clone git@github.com:vanetix/que.git && cd que`
+- `stack build`
+
+## Testing
+
+Unit tests can be ran with `stack test`.
+
+## Install
+
+Que can be installed to the stack path with `stack install`.
+
 ## License
 
 Copyright 2020 Matt McFarland
