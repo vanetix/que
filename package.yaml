@@ -33,7 +33,7 @@ library:
   - yaml
 
 executables:
-  que-exe:
+  que:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
