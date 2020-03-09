@@ -4,6 +4,7 @@ module Main where
 
 import Data.Either (fromRight)
 import Data.Time.Clock (getCurrentTime)
+import Data.Time.LocalTime (getCurrentTimeZone)
 import Options.Applicative
 import qualified Lib
 
@@ -49,10 +50,11 @@ parseCommand =
 
 run :: Options -> IO ()
 run (Options cmd) = do
+  tz <- getCurrentTimeZone
   loadedTodos <- Lib.load
   newTodos <- runCommand cmd $ fromRight [] loadedTodos
   _ <- Lib.save newTodos
-  putStrLn $ show newTodos
+  putStrLn $ Lib.display tz newTodos
 
 runCommand :: Command -> Lib.Todos -> IO Lib.Todos
 runCommand cmd todos = do

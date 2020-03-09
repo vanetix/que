@@ -24,10 +24,10 @@ dependencies:
 library:
   source-dirs: src
   dependencies:
+  - ansi-terminal
+  - boxes
   - directory
   - filepath
-  - prettyprinter
-  - prettyprinter-ansi-terminal
   - text
   - time
   - yaml
