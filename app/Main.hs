@@ -6,7 +6,7 @@ import Data.Either (fromRight)
 import Data.Time.Clock (getCurrentTime)
 import Data.Time.LocalTime (getCurrentTimeZone)
 import Options.Applicative
-import qualified Lib
+import qualified Que
 
 data Command
   = New String
@@ -51,26 +51,26 @@ parseCommand =
 run :: Options -> IO ()
 run (Options cmd) = do
   tz <- getCurrentTimeZone
-  loadedTodos <- Lib.load
+  loadedTodos <- Que.load
   newTodos <- runCommand cmd $ fromRight [] loadedTodos
-  _ <- Lib.save newTodos
-  putStrLn $ Lib.display tz newTodos
+  _ <- Que.save newTodos
+  putStrLn $ Que.display tz newTodos
 
-runCommand :: Command -> Lib.Todos -> IO Lib.Todos
+runCommand :: Command -> Que.Todos -> IO Que.Todos
 runCommand cmd todos = do
   t <- getCurrentTime
 
   case cmd of
     New content ->
-      pure $ Lib.new t content todos
+      pure $ Que.new t content todos
     Done i ->
-      case Lib.done t i todos of
+      case Que.done t i todos of
         Left msg -> do
           putStrLn msg
           pure $ todos
         Right newTodos ->
           pure $ newTodos
     Drop i -> do
-      pure $ Lib.remove i todos
+      pure $ Que.remove i todos
     _ ->
       pure todos
