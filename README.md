@@ -1,5 +1,6 @@
 # Que
 
+![stack test](https://github.com/vanetix/que/workflows/stack%20test/badge.svg)
 [![CircleCI](https://circleci.com/gh/vanetix/que.svg?style=svg)](https://circleci.com/gh/vanetix/que)
 
 A Todo tracking CLI tool written in Haskell for learning purposes.
