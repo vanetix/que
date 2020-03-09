@@ -1,10 +1,10 @@
 name:                que
-version:             0.1.0.0
+version:             0.1.0
 github:              "vanetix/que"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2020 Author name here"
+author:              "Matt McFarland"
+maintainer:          "783024+vanetix@users.noreply.github.com"
+copyright:           "2020 Matt McFarland"
 
 extra-source-files:
 - README.md
