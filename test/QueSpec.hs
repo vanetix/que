@@ -3,6 +3,7 @@ module QueSpec
   , spec
   ) where
 
+import Data.Sequence ((!?))
 import Data.Time.Clock (getCurrentTime)
 import Test.Hspec
 
@@ -21,7 +22,8 @@ spec = do
     it "should mark todo complete" $ do
       t <- getCurrentTime
       todos <- new
-      let Right (Que.Todo {Que.completed = Just done}:[]) = Que.done t 1 todos
+      let Right newTodos = Que.done t 1 todos
+      let Just (Que.Todo {Que.completed = Just done}) = newTodos !? 0
       done `shouldBe` t
   describe "remove" $ do
     it "should remove todo" $ do
@@ -31,4 +33,4 @@ spec = do
 new :: IO Que.Todos
 new = do
   t <- getCurrentTime
-  return $ Que.new t "work" []
+  return $ Que.new t "work" Que.empty

@@ -7,6 +7,7 @@ module Que
   , Todos
   , done
   , load
+  , empty
   , new
   , display
   , remove
@@ -14,12 +15,16 @@ module Que
   ) where
 
 import Data.Bifunctor (first)
+import Data.Foldable (toList)
 import Data.List (find, transpose)
+import Data.Sequence (Seq, (|>), deleteAt, lookup, mapWithIndex, update)
+import qualified Data.Sequence as Sequence
 import Data.Text (Text, pack, unpack)
 import Data.Time.Clock (UTCTime)
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Data.Time.LocalTime (TimeZone, utcToLocalTime)
 import GHC.Generics (Generic)
+import Prelude hiding (lookup)
 import qualified System.Directory as Directory
 import qualified System.FilePath as FilePath
 import Text.PrettyPrint.Boxes (Box, hsep, left, render, text, vcat)
@@ -41,12 +46,11 @@ import System.Console.ANSI
   , setSGRCode
   )
 
-type Todos = [Todo]
+type Todos = Seq Todo
 
 data Todo =
   Todo
-    { tId :: Int
-    , body :: Text
+    { body :: Text
     , created :: UTCTime
     , completed :: Maybe UTCTime
     }
@@ -72,31 +76,28 @@ save todos = do
   encodeFile path todos
   pure Nothing
 
+empty :: Todos
+empty = Sequence.empty
+
 new :: UTCTime -> String -> Todos -> Todos
-new time str todos = t : todos
+new time str todos = todos |> t
   where
-    t =
-      Todo
-        { tId = length todos + 1
-        , body = pack str
-        , created = time
-        , completed = Nothing
-        }
+    t = Todo {body = pack str, created = time, completed = Nothing}
 
 remove :: Int -> Todos -> Todos
-remove i = filter ((/= i) . tId)
+remove i = deleteAt $ unhumanizeId i
 
 done :: UTCTime -> Int -> Todos -> Either String Todos
 done time todoId todos =
-  let found = find (\t -> (tId t) == todoId) todos
-   in case found of
-        Just t -> Right $ completeTodo time t <$> todos
-        Nothing -> Left "no todo with id exists"
+  case found of
+    Just t -> Right $ update id (completeTodo time t) todos
+    Nothing -> Left $ "no todo with id exists " ++ (show id)
+  where
+    id = unhumanizeId todoId
+    found = lookup id todos
 
-completeTodo :: UTCTime -> Todo -> Todo -> Todo
-completeTodo time needle todo
-  | (tId needle) == (tId todo) = todo {completed = Just time}
-  | otherwise = todo
+completeTodo :: UTCTime -> Todo -> Todo
+completeTodo time todo = todo {completed = Just time}
 
 displayTime :: TimeZone -> UTCTime -> String
 displayTime tz =
@@ -110,9 +111,15 @@ color c = SetColor Foreground Vivid c
 bold :: SGR
 bold = SetConsoleIntensity BoldIntensity
 
-displayTodo :: TimeZone -> Todo -> [Box]
-displayTodo tz Todo {tId = i, body = b, created = c, completed = comp} =
-  [ text $ (setSGRCode [color White, bold]) ++ (show i)
+humanizeId :: Int -> Int
+humanizeId = (+) 1
+
+unhumanizeId :: Int -> Int
+unhumanizeId i = i - 1
+
+displayTodo :: TimeZone -> Int -> Todo -> [Box]
+displayTodo tz idx Todo {body = b, created = c, completed = comp} =
+  [ text $ (setSGRCode [color White, bold]) ++ (show . humanizeId $ idx)
   , text $ (setSGRCode [Reset]) ++ (unpack b)
   , text date
   ]
@@ -125,4 +132,4 @@ displayTodo tz Todo {tId = i, body = b, created = c, completed = comp} =
 display :: TimeZone -> Todos -> String
 display tz todos = render . hsep 4 left $ vcat left <$> columns
   where
-    columns = transpose $ displayTodo tz <$> todos
+    columns = transpose $ toList $ mapWithIndex (displayTodo tz) todos

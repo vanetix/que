@@ -26,6 +26,7 @@ library:
   dependencies:
   - ansi-terminal
   - boxes
+  - containers
   - directory
   - filepath
   - text
@@ -54,6 +55,7 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - containers
     - hspec
     - time
     - que

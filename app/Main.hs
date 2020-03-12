@@ -62,7 +62,7 @@ run (Options Version) = do
 run (Options cmd) = do
   tz <- getCurrentTimeZone
   loadedTodos <- Que.load
-  newTodos <- runCommand cmd $ fromRight [] loadedTodos
+  newTodos <- runCommand cmd $ fromRight Que.empty loadedTodos
   _ <- Que.save newTodos
   putStrLn $ Que.display tz newTodos
 
